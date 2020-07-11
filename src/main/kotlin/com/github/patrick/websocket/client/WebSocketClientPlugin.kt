@@ -22,22 +22,18 @@ class WebSocketClientPlugin : JavaPlugin() {
         INSTANCE = this
 
         saveDefaultConfig()
-        url = requireNotNull(config?.getString("url")) { "URL missing from config.yml" }
-        tls = requireNotNull(config?.getBoolean("tls")) { "TLS option missing from config.yml" }
-
-        createWebSocket()
 
         @Suppress("UsePropertyAccessSyntax")
         getCommand("socket")?.run {
             setExecutor(WebSocketClientCommand())
             setTabCompleter(WebSocketClientCommand())
         }
-        server.pluginManager.registerEvents(WebSocketClientListener(), this)
         server.scheduler.runTaskTimer(this, WebSocketClientConfigTask(), 0, 1)
+        server.pluginManager.registerEvents(WebSocketClientListener(), this)
     }
 
     internal fun createWebSocket() {
-        client = WebSocketAPI.createWebSocket(url, tls = true, suppress = false)
+        client = WebSocketAPI.createWebSocket(url, tls = tls, suppress = false)
         if (client == null) {
             println("WARN: Cannot connect to websocket. Please retry using /socket retry")
         }

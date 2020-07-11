@@ -15,6 +15,7 @@ class WebSocketClientConfigTask : Runnable {
                 tls = requireNotNull(config?.getBoolean("tls")) { "TLS option missing from config.yml" }
                 client = null
                 lastModified = last
+                createWebSocket()
             }
         }
     }

@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.github.patrick-mc"
-version = "1.0.2"
+version = "1.0.3"
 
 repositories {
     maven("https://repo.maven.apache.org/maven2/")
@@ -15,7 +15,7 @@ repositories {
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
     compileOnly("org.spigotmc:spigot-api:1.8-R0.1-SNAPSHOT")
-    compileOnly("com.github.patrick-mc:websocket-client-api:1.0.2")
+    compileOnly("com.github.patrick-mc:websocket-client-api:1.0.3")
 }
 
 tasks {
@@ -27,6 +27,6 @@ tasks {
 
     create<Copy>("distJar") {
         from(shadowJar)
-        into("W:\\Servers\\1.13.2\\plugins")
+        into("W:\\Servers\\1.16.1\\plugins")
     }
 }

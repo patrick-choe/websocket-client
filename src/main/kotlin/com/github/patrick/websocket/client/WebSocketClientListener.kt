@@ -15,7 +15,7 @@ class WebSocketClientListener : Listener {
         if (event.socket == instance.client?.socket) {
             println("connected to ${instance.url}")
             event.headers.forEach {
-                println("${it.key}: ${it.value.joinToString(System.lineSeparator())}}")
+                println("${it.key}: ${it.value.joinToString(System.lineSeparator())}")
             }
         }
     }
@@ -31,9 +31,7 @@ class WebSocketClientListener : Listener {
     fun onMessage(event: WebSocketMessageEvent) {
         println(event.message)
         if (event.socket == instance.client?.socket) {
-            Bukkit.getScheduler().callSyncMethod(instance) {
-                Bukkit.dispatchCommand(instance.server.consoleSender, event.message)
-            }.get()
+            Bukkit.dispatchCommand(instance.server.consoleSender, event.message)
         }
     }
 }
