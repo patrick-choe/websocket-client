@@ -13,6 +13,7 @@ class WebSocketClientConfigTask : Runnable {
                 reloadConfig()
                 url = requireNotNull(config?.getString("url")) { "URL missing from config.yml" }
                 tls = requireNotNull(config?.getBoolean("tls")) { "TLS option missing from config.yml" }
+                client = null
                 lastModified = last
             }
         }
