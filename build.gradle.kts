@@ -10,13 +10,12 @@ repositories {
     maven("https://repo.maven.apache.org/maven2/")
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    mavenLocal()
 }
 
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
     compileOnly("org.spigotmc:spigot-api:1.8-R0.1-SNAPSHOT")
-    compileOnly("com.github.patrick-mc:websocket-client-api:1.0.1")
+    compileOnly("com.github.patrick-mc:websocket-client-api:1.0.2")
 }
 
 tasks {

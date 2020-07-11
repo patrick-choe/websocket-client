@@ -13,10 +13,10 @@ class WebSocketClientPlugin : JavaPlugin() {
         internal set
 
     lateinit var url: String
-        private set
+        internal set
 
     var tls = false
-        private set
+        internal set
 
     override fun onEnable() {
         INSTANCE = this
@@ -33,6 +33,7 @@ class WebSocketClientPlugin : JavaPlugin() {
             setTabCompleter(WebSocketClientCommand())
         }
         server.pluginManager.registerEvents(WebSocketClientListener(), this)
+        server.scheduler.runTaskTimer(this, WebSocketClientConfigTask(), 0, 1)
     }
 
     internal fun createWebSocket() {

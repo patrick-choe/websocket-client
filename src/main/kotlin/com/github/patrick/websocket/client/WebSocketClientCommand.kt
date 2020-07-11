@@ -13,26 +13,19 @@ class WebSocketClientCommand : CommandExecutor, TabCompleter {
         if (args.count() == 1) {
             instance.run {
                 when (args[0].toLowerCase()) {
-                    "retry" -> {
-                        if (client == null) {
-                            createWebSocket()
-                        } else {
-                            sender.sendMessage("Client already exists")
-                        }
+                    "retry" -> when (client) {
+                        null -> createWebSocket()
+                        else -> sender.sendMessage("Client already exists")
                     }
-                    "connect" -> {
-                        if (client == null) {
-                            sender.sendMessage("Client does not exist. Please retry using /$label retry")
-                        } else {
-                            client?.connect()
-                        }
+                    "connect" -> when {
+                        client == null -> sender.sendMessage("Client does not exist. Please retry using /$label retry")
+                        client?.connected == true -> sender.sendMessage("Client already connected")
+                        else -> client?.connect()
                     }
-                    "disconnect" -> {
-                        if (client == null) {
-                            sender.sendMessage("Client does not exist. Please retry using /$label retry")
-                        } else {
-                            client?.connect()
-                        }
+                    "disconnect" -> when {
+                        client == null -> sender.sendMessage("Client does not exist. Please retry using /$label retry")
+                        client?.connected == false -> sender.sendMessage("Client not connected")
+                        else -> client?.disconnect()
                     }
                     else -> {
                         sender.sendMessage("/$label retry connect disconnect")

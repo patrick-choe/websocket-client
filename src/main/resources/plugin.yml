@@ -2,7 +2,7 @@ name: WebSocketClient
 main: com.github.patrick.websocket.client.WebSocketClientPlugin
 version: 1.0-SNAPSHOT
 api-version: "1.13"
-depend: [Kotlin]
+depend: [Kotlin, WebSocketAPI]
 commands:
   socket:
     description: socket command
