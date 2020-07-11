@@ -1,0 +1,13 @@
+name: WebSocketClient
+main: com.github.patrick.websocket.client.WebSocketClientPlugin
+version: 1.0-SNAPSHOT
+api-version: "1.13"
+depend: [Kotlin]
+commands:
+  socket:
+    description: socket command
+    permission: socket.command
+permissions:
+  socket.command:
+    description: socket command permission
+    default: op
