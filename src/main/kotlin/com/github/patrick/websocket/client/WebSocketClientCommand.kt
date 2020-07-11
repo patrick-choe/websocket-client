@@ -27,11 +27,11 @@ class WebSocketClientCommand : CommandExecutor, TabCompleter {
                         client?.connected == false -> sender.sendMessage("Client not connected")
                         else -> client?.disconnect()
                     }
-                    else -> {
-                        sender.sendMessage("/$label retry connect disconnect")
-                    }
+                    else -> sender.sendMessage("/$label retry connect disconnect")
                 }
             }
+        } else {
+            sender.sendMessage("/$label retry connect disconnect")
         }
         return true
     }
