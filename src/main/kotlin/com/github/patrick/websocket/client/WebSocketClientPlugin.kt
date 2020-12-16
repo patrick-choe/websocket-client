@@ -22,6 +22,13 @@ package com.github.patrick.websocket.client
 
 import com.github.patrick.websocket.WebSocketAPI
 import com.github.patrick.websocket.WebSocketClient
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.builder.RequiredArgumentBuilder
+import net.minecraft.server.v1_16_R3.ArgumentChat
+import net.minecraft.server.v1_16_R3.ChatComponentText
+import net.minecraft.server.v1_16_R3.CommandListenerWrapper
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer
+import org.bukkit.craftbukkit.v1_16_R3.command.VanillaCommandWrapper
 import org.bukkit.plugin.java.JavaPlugin
 
 class WebSocketClientPlugin : JavaPlugin() {
@@ -29,33 +36,73 @@ class WebSocketClientPlugin : JavaPlugin() {
         lateinit var INSTANCE: WebSocketClientPlugin
     }
 
-    var client: WebSocketClient? = null
-        internal set
+    lateinit var client: WebSocketClient
+        private set
 
-    lateinit var url: String
-        internal set
-
-    var tls = false
-        internal set
+    internal var connected = false
 
     override fun onEnable() {
+        val server = server as CraftServer
+
         INSTANCE = this
 
         saveDefaultConfig()
 
-        @Suppress("UsePropertyAccessSyntax")
-        getCommand("socket")?.run {
-            setExecutor(WebSocketClientCommand())
-            setTabCompleter(WebSocketClientCommand())
-        }
         server.scheduler.runTaskTimer(this, WebSocketClientConfigTask(), 0, 1)
         server.pluginManager.registerEvents(WebSocketClientListener(), this)
+
+        val commandDispatcher = server.server.commandDispatcher
+
+        val send = LiteralArgumentBuilder.literal<CommandListenerWrapper>("send").requires { wrapper ->
+            wrapper.hasPermission(4)
+        }.then(
+            RequiredArgumentBuilder.argument<CommandListenerWrapper, ArgumentChat.a>("message", ArgumentChat.a())
+                .executes { context ->
+                    val message = ArgumentChat.a(context, "message").string
+
+                    if (this::client.isInitialized && connected) {
+                        client.send(message)
+
+                        1
+                    } else {
+                        context.source.sendFailureMessage(ChatComponentText("client not available"))
+
+                        0
+                    }
+                }
+        )
+
+        val reconnect = LiteralArgumentBuilder.literal<CommandListenerWrapper>("reconnect").requires { wrapper ->
+            wrapper.hasPermission(4)
+        }.executes { context ->
+            if (this::client.isInitialized && connected) {
+                connected = false
+                server.scheduler.runTaskAsynchronously(this, Runnable {
+                    connected = client.reconnect()
+                })
+
+                1
+            } else {
+                context.source.sendFailureMessage(ChatComponentText("client not available"))
+
+                0
+            }
+        }
+
+        with(commandDispatcher.a()) {
+            register(send)
+            register(reconnect)
+        }
+
+        with(server.commandMap) {
+            register("send", "minecraft", VanillaCommandWrapper(commandDispatcher, send.build()))
+            register("reconnect", "minecraft", VanillaCommandWrapper(commandDispatcher, reconnect.build()))
+        }
     }
 
-    internal fun createWebSocket() {
-        client = WebSocketAPI.createWebSocket(url, tls = tls, suppress = false)
-        if (client == null) {
-            println("WARN: Cannot connect to websocket. Please retry using /socket retry")
-        }
+    internal fun createWebSocket(url: String, tls: Boolean): WebSocketClient {
+        client = WebSocketAPI.createUnsafeWebSocket(url, tls, false)
+
+        return client
     }
 }

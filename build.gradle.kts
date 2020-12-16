@@ -18,35 +18,56 @@
  * Contact me on <mailpatrickkr@gmail.com>
  */
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    kotlin("jvm") version "1.3.72"
-    id("com.github.johnrengelman.shadow") version "6.0.0"
+    kotlin("jvm") version "1.4.20"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 group = "com.github.patrick-mc"
-version = "1.0.4"
+version = "1.1.0"
 
 repositories {
     maven("https://repo.maven.apache.org/maven2/")
-    maven("https://oss.sonatype.org/content/repositories/snapshots/")
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    maven("https://jcenter.bintray.com/")
+    mavenLocal()
 }
 
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
-    compileOnly("org.spigotmc:spigot-api:1.8-R0.1-SNAPSHOT")
-    compileOnly("com.github.patrick-mc:websocket-client-api:1.0.4")
+    compileOnly("org.spigotmc:spigot:1.16.4-R0.1-SNAPSHOT")
+    compileOnly("com.github.patrick-mc:websocket-client-api:1.1.0")
 }
 
 tasks {
-    compileKotlin { kotlinOptions.jvmTarget = "1.8" }
-
-    shadowJar {
-        archiveClassifier.set("dist")
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
     }
 
-    create<Copy>("distJar") {
-        from(shadowJar)
-        into("W:\\Servers\\1.16.1\\plugins")
+    withType<ShadowJar> {
+        archiveClassifier.set("")
+    }
+
+    if (System.getProperty("os.name").startsWith("Windows")) {
+        create<Copy>("distJar") {
+            from(shadowJar)
+
+            val fileName = "${project.name.split("-").joinToString("") { it.capitalize() }}.jar"
+
+            rename {
+                fileName
+            }
+
+            val pluginsDir = "W:\\Servers\\1.16.4\\plugins"
+            val updateDir = "$pluginsDir\\update"
+
+            if (file("$pluginsDir\\$fileName").exists()) {
+                into(updateDir)
+            } else {
+                into(pluginsDir)
+            }
+        }
     }
 }

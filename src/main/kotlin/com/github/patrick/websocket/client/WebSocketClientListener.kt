@@ -32,25 +32,22 @@ class WebSocketClientListener : Listener {
 
     @EventHandler
     fun onConnect(event: WebSocketConnectedEvent) {
-        if (event.socket == instance.client?.socket) {
-            println("connected to ${instance.url}")
-            event.headers.forEach {
-                println("${it.key}: ${it.value.joinToString(System.lineSeparator())}")
-            }
+        if (event.socket == instance.client.socket) {
+            println("connected to socket")
         }
     }
 
     @EventHandler
     fun onDisconnect(event: WebSocketDisconnectedEvent) {
-        if (event.socket == instance.client?.socket) {
-            println("disconnected from ${instance.url}")
+        if (event.socket == instance.client.socket) {
+            println("disconnected from socket")
         }
     }
 
     @EventHandler
     fun onMessage(event: WebSocketMessageEvent) {
-        println(event.message)
-        if (event.socket == instance.client?.socket) {
+        println("msg: ${event.message}")
+        if (event.socket == instance.client.socket) {
             Bukkit.dispatchCommand(instance.server.consoleSender, event.message)
         }
     }
